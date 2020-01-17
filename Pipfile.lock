@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "90173d7d37075b40674c0bc63a2d1776d3d4d5faf87e5122219657e674e0ea42"
+            "sha256": "a4f89a4b699f077dccb3779b84c45b3c7b97019ef4ebd1ab9fbc9a4040ca248e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,14 +16,6 @@
         ]
     },
     "default": {
-        "colorama": {
-            "hashes": [
-                "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff",
-                "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"
-            ],
-            "markers": "sys_platform == 'win32'",
-            "version": "==0.4.3"
-        },
         "coloredlogs": {
             "hashes": [
                 "sha256:34fad2e342d5a559c31b6c889e8d14f97cb62c47d9a2ae7b5ed14ea10a79eff8",
@@ -46,13 +38,12 @@
             ],
             "version": "==4.18"
         },
-        "pyreadline": {
+        "paho-mqtt": {
             "hashes": [
-                "sha256:4530592fc2e85b25b1a9f79664433da09237c1a270e4d78ea5aa3a2c7229e2d1",
-                "sha256:cd479a6922ea618bd4bfb1c1ce995cb1d9e59da801288627ba243bdae90330d9"
+                "sha256:e3d286198baaea195c8b3bc221941d25a3ab0e1507fc1779bdb7473806394be4"
             ],
-            "markers": "sys_platform == 'win32'",
-            "version": "==2.1"
+            "index": "pypi",
+            "version": "==1.5.0"
         }
     },
     "develop": {}

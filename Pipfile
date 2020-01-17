@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 configargparse = "*"
 coloredlogs = "*"
+paho-mqtt = "*"
 
 [requires]
 python_version = "3.8"

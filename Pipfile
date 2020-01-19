@@ -10,6 +10,7 @@ pylint = "*"
 configargparse = "*"
 coloredlogs = "*"
 paho-mqtt = "*"
+python-telegram-bot = "*"
 
 [requires]
 python_version = "3.8"

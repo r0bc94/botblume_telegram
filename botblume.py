@@ -9,6 +9,9 @@ LOGGING_LEVEL_COLORS = {
     'debug': {
         'color': 'black',
         'bright': True
+    },
+    'error': {
+        'color': 'red',
     }
 }
 
@@ -28,7 +31,9 @@ def setup_logger(logger: logging.Logger, logDebug: bool):
     loglevel = 'DEBUG' if logDebug else 'INFO'
     coloredlogs.install(loglevel, fmt=LOGGING_FORMAT, level_styles=LOGGING_LEVEL_COLORS, field_styles=LOGGING_FIELD_COLORS)
     logger.debug('Logger installed')
-    logger.debug('Debug Logs Activated')
+
+    if logDebug:
+        logger.info('Debug Logs Activated')
 
 def setup_config_arguments(argParser: configargparse.ArgParser):
     argParser.add_argument('-c', '--config-file', required=False, is_config_file=True, help='Path to the Config File which should be used.')

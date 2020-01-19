@@ -1,12 +1,13 @@
 import logging
 import paho.mqtt.client as mqtt
 
+from src.message import Message
 
 class MqttClient(mqtt.Client):
   """
   This Class represents the MQTT - Client which handles each mqtt - message.
   """
-  def __init__(self, mqttAddress, mqttPort, mqttTopicName, callback, **kwargs):
+  def __init__(self, mqttAddress, mqttPort, mqttTopicName, callback, delimiter=';', **kwargs):
     # self.__client = mqtt.Client(client_id=clientId)
     self.__callback = callback
     self.__logger = logging.getLogger().getChild('mqtt_client')
@@ -14,6 +15,8 @@ class MqttClient(mqtt.Client):
     self.__mqttAddress = mqttAddress
     self.__mqttPort = mqttPort
     self.__mqttTopicName = mqttTopicName
+
+    self.__delimiter = delimiter
 
     super().__init__(kwargs)
 
@@ -43,3 +46,35 @@ class MqttClient(mqtt.Client):
     self.__logger.debug(f'Message Received')
     self.__logger.debug(f'Topic: {msg.topic}')
     self.__logger.debug(f'Message Payload: {msg.payload}')
+
+    # Since the main loop is running in a dedicated thread, 
+    # all exceptions are kinda swallowed. 
+    # Therefore, we have to catch them again manually.
+    message = None
+    try:
+      message = self.__processMessage(msg.topic, msg.payload)
+
+      if message is not None:
+        self.__callback(message)
+        
+    except Exception as ex:
+      self.__logger.error('An Exception was thrown on the MQTT Listener Thread')
+      self.__logger.exception(ex)
+      raise ex
+
+  def __processMessage(self, topic, message):
+    msgObj = None
+    try:
+      aggregated, raw, requested = message.decode().split(self.__delimiter)
+      sensorNumber = topic.split('/')[1]
+
+      msgObj = Message(sensorNumber=sensorNumber,
+        aggregatedValue=int(aggregated),
+        rawValue=int(raw),
+        requested=bool(requested))
+    
+    except ValueError:
+      self.__logger.error(f'Could not parse the message f{message} for topic f{topic}')
+      self.__logger.error('Check the format of your message!')
+
+    return msgObj

@@ -68,10 +68,12 @@ class MqttClient(mqtt.Client):
       aggregated, raw, requested = message.decode().split(self.__delimiter)
       sensorNumber = topic.split('/')[1]
 
+      requestedAsBool = requested.lower() in ['1', 'true']
+
       msgObj = Message(sensorNumber=sensorNumber,
         aggregatedValue=int(aggregated),
         rawValue=int(raw),
-        requested=bool(requested))
+        requested=requestedAsBool)
     
     except ValueError:
       self.__logger.error(f'Could not parse the message f{message} for topic f{topic}')

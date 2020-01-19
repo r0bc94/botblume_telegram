@@ -40,7 +40,7 @@ class MqttClient(mqtt.Client):
 
   def on_connect(self, mqttc, obj, flags, rc):
     self.__logger.info('Connected to the MQTT - Server.')
-    self.subscribe(f'{self.__mqttTopicName}/#')
+    self.subscribe(f'{self.__mqttTopicName}/+/status')
 
   def on_message(self, mqttc, obj, msg):
     self.__logger.debug(f'Message Received')

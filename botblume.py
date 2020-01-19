@@ -1,8 +1,12 @@
 import coloredlogs
 import logging
 import configargparse
-
  
+from time import sleep
+
+from src.mqtt_client import MqttClient
+
+import paho.mqtt.client as mqtt
 
 LOGGING_FORMAT = '[%(levelname)s] %(asctime)s %(name)s: %(message)s'
 LOGGING_LEVEL_COLORS = {
@@ -50,4 +54,11 @@ args = argumentParser.parse_args()
 logger = logging.getLogger(__name__)
 setup_logger(logger,  args.debug)
 
-print(args)
+def cb(message):
+    print(message)
+
+mqttClient = MqttClient('192.168.1.5', 1883, 'blume', cb)
+mqttClient.start()
+while True:
+    sleep(1)
+    mqttClient.querySensor(1)

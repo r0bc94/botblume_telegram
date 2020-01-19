@@ -33,6 +33,10 @@ class MqttClient(mqtt.Client):
     
     self.__logger.debug('Starting Listener Loop...')
     self.loop_start()
+  
+  def querySensor(self, sensorNumber):
+    #todo: Also make the parameter for the water level optional.
+    self.publish(f'{self.__mqttTopicName}/{sensorNumber}/wasserstand')
 
   def shutdown(self):
     self.__logger.debug('Stopping MQTT - Listener Loop')
@@ -56,7 +60,7 @@ class MqttClient(mqtt.Client):
 
       if message is not None:
         self.__callback(message)
-        
+
     except Exception as ex:
       self.__logger.error('An Exception was thrown on the MQTT Listener Thread')
       self.__logger.exception(ex)

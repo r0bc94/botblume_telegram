@@ -16,5 +16,13 @@ class TelegramBot():
     self.__logger.debug(update)
     self.__messageCallback(update, context)
     
+  def sendMessage(self, chatId, message, photo=None):
+    if photo:
+      self.__updater.bot.send_photo(chat_id=chatId, photo=photo)
+    
+    self.__logger.debug(f'Sending Message to chat with id: {chatId}')
+    self.__logger.debug(f'Message Content: {message}')
+    self.__updater.bot.send_message(chat_id=chatId, text=message)
+
   def listen(self):
     self.__updater.start_polling()

@@ -12,6 +12,8 @@ class TelegramBot():
     self.__dispatcher.add_handler(CommandHandler('wasserstand', self.__flowerCommand))
 
   def __flowerCommand(self, update, context):
+    self.__logger.debug('Update Received:')
+    self.__logger.debug(update)
     self.__messageCallback(update, context)
     
   def listen(self):

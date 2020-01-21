@@ -14,6 +14,9 @@ LOGGING_LEVEL_COLORS = {
         'color': 'black',
         'bright': True
     },
+    'warning': {
+        'color': 'yellow'
+    },
     'error': {
         'color': 'red',
     }

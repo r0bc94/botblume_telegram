@@ -58,6 +58,7 @@ class FlowerHandler():
               lastRanges.append([currentMessage['percentage_min'], currentMessage['percentage_max']])
             else:
               for curMin, curMax in lastRanges:
+                rangeInvalid |= currentMessage['percentage_min'] >= currentMessage['percentage_max']
                 rangeInvalid |= currentMessage['percentage_min'] <= curMax
                 print(rangeInvalid)
 

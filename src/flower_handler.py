@@ -87,8 +87,8 @@ class FlowerHandler():
           self.__logger.warning('Please specify the path to the photo by using the "photo_path" property.')
       
       if missingKeys:
-        self.__logger.error('There are some keys missing')
-        self.__logger.error(f'Missing Keys: {missingKeys}')
+        self.__logger.warning('There are some keys missing')
+        self.__logger.warning(f'Missing Keys: {missingKeys}')
         continue
 
       if not nameInvalid and not idInvalid and not rangeInvalid:

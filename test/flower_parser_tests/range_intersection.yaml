@@ -1,0 +1,12 @@
+- name: "flower1"
+  id: 1
+  messages:
+    - percentage_min: 0
+      percentage_max: 15
+      message: "Please water me soon."
+      include_photo: true
+      photo_path: "water.png"
+
+    - percentage_min: 14
+      percentage_max: 30
+      message: "Im okay but you should water me in the near future"

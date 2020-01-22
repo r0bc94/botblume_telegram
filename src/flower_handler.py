@@ -78,6 +78,13 @@ class FlowerHandler():
             self.__logger.warning(f'Invalid Message Range {curMin} - {curMax}')
             self.__logger.warning('This Flower will be ignored.')
             break
+
+      # Check if the path to a photo is provided, when sending a photo
+      # with the message.
+      if key == 'include_photo' and value == True:
+        if 'photo_path' not in currentFlower.keys():
+          self.__logger.warning('A photo should be included, but no path was specified.')
+          self.__logger.warning('Please specify the path to the photo by using the "photo_path" property.')
       
       if missingKeys:
         self.__logger.error('There are some keys missing')

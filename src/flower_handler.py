@@ -40,6 +40,7 @@ class FlowerHandler():
     for currentFlower in parsedYaml:
       missingKeys = []
       nameInvalid = False
+      idInvalid = False
       rangeInvalid = False
 
       for key, value in currentFlower.items():
@@ -50,10 +51,17 @@ class FlowerHandler():
         # Check for dublicate names:
         if key == 'name':
           for validFlower in validFlowers:
-            if validFlower['name'] == value:
+            if validFlower[key] == value:
               self.__logger.warning(f'Dublicate Flower with name {value}')
               self.__logger.warning('This flower will be ignored!')
               nameInvalid = True
+
+        if key == 'mqtt_id':
+          for validFlower in validFlowers:
+            if validFlower[key] == value:
+              self.__logger.warning(f'Dublicate Flower with mqtt_id "{value}"')
+              self.__logger.warning('This flower will be ignored!')
+              idInvalid = True
 
         # Check the message ranges
         if key == 'messages':
@@ -65,15 +73,18 @@ class FlowerHandler():
               for curMin, curMax in lastRanges:
                 rangeInvalid |= currentMessage['percentage_min'] >= currentMessage['percentage_max']
                 rangeInvalid |= currentMessage['percentage_min'] <= curMax
-                print(rangeInvalid)
 
           if rangeInvalid:
             self.__logger.warning(f'Invalid Message Range {curMin} - {curMax}')
             self.__logger.warning('This Flower will be ignored.')
             break
       
-      print(rangeInvalid)
-      if not nameInvalid and not rangeInvalid:
+      if missingKeys:
+        self.__logger.error('There are some keys missing')
+        self.__logger.error(f'Missing Keys: {missingKeys}')
+        continue
+
+      if not nameInvalid and not idInvalid and not rangeInvalid:
         validFlowers.append(currentFlower)
   
     return validFlowers

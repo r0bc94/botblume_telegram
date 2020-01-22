@@ -79,8 +79,8 @@ class FlowerHandler():
             self.__logger.warning('This Flower will be ignored.')
             break
 
-      # Check if the path to a photo is provided, when sending a photo
-      # with the message.
+      # Check if the path to a photo is provided, when the 
+      # include_photo property is set to True.
       if key == 'include_photo' and value == True:
         if 'photo_path' not in currentFlower.keys():
           self.__logger.warning('A photo should be included, but no path was specified.')

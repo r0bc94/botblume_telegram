@@ -22,6 +22,8 @@ class FlowerHandler():
       self.__logger.error('Please check the format of the given file.')
       self.__logger.exception(ymerr)
 
+    return self.__parsedFlowers
+
   
   def __sanityCheck(self, parsedYaml):
     """

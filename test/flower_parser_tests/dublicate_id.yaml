@@ -1,5 +1,5 @@
 - name: "flower1"
-  id: 1
+  mqtt_id: 1
   messages:
     - percentage_min: 0
       percentage_max: 15
@@ -12,7 +12,7 @@
       message: "Im okay but you should water me in the near future"
 
 - name: "flower2"
-  id: 1
+  mqtt_id: 1
   messages:
     - percentage_min: 0
       percentage_max: 15

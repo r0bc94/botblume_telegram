@@ -1,5 +1,5 @@
 - name: "flower1"
-  id: 1
+  mqtt_id: 1
   messages:
     - percentage_min: 0
       percentage_max: 15

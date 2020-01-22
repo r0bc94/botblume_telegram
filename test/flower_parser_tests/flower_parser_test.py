@@ -34,6 +34,21 @@ class TestFlowerHandler():
     
     self.__compareResults(expected, result) 
 
+  def testNoPhotoPath(self, flowerHandler):
+    try:
+      flowerHandler.parse('test/flower_parser_tests/no_photo_path_given.yaml')
+    
+      assert False, 'There was no exception thrown.'
+    except ValueError:
+      assert True
+
+    except AssertionError:
+      raise
+
+    except Exception:
+      assert False, 'An unexcepted exception was thrown while parsing the yaml file.'
+
+
   def __compareResults(self, should, result):
     for curShouldDict, curResultDict in zip(should, result):
       # Compare the keys

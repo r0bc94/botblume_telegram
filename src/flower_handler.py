@@ -10,7 +10,10 @@ class FlowerHandler():
     try:
       parsedFlowers = safe_load(open(flowerFilePath))
       validFlowers = self.__sanityCheck(parsedFlowers)
-      print(validFlowers)
+
+      if not validFlowers:
+        raise ValueError('Failed to parse all flowers from the FlowerFile.')
+      
       self.__parsedFlowers = validFlowers
 
     except FileNotFoundError:

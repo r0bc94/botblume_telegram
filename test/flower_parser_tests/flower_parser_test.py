@@ -10,9 +10,8 @@ class TestFlowerHandler():
 
   def testValid(self, flowerHandler):
     parsed = flowerHandler.parse('test/flower_parser_tests/valid_flowerfile.yaml')
-    should = [{'name': 'flower1', 'id': 1, 'messages': [{'percentage_min': 0, 'percentage_max': 15, 'message': 'Please water me soon.', 'include_photo': True, 'photo_path': 'water.png'}, {'percentage_min': 16, 'percentage_max': 30, 'message': 'Im okay but you should water me in the near future'}]}]
+    should = [{'name': 'flower1', 'mqtt_id': 1, 'messages': [{'percentage_min': 0, 'percentage_max': 15, 'message': 'Please water me soon.', 'include_photo': True, 'photo_path': 'water.png'}, {'percentage_min': 16, 'percentage_max': 30, 'message': 'Im okay but you should water me in the near future'}]}]
     self.__compareResults(should, parsed)
-    print(parsed)
     self.__compareResults(should, parsed)
 
   def testIntersectingRanges(self, flowerHandler):
@@ -30,19 +29,10 @@ class TestFlowerHandler():
       assert False, 'An unexcepted exception was thrown while parsing the yaml file.'
 
   def testDublicateId(self, flowerHandler):
-    try:
-      flowerHandler.parse('test/flower_parser_tests/dublicate_id.yaml')
+    expected = [{'name': 'flower1', 'mqtt_id': 1, 'messages': [{'percentage_min': 0, 'percentage_max': 15, 'message': 'Please water me soon.', 'include_photo': True, 'photo_path': 'water.png'}, {'percentage_min': 16, 'percentage_max': 30, 'message': 'Im okay but you should water me in the near future'}]}]
+    result = flowerHandler.parse('test/flower_parser_tests/dublicate_id.yaml')
     
-      assert False, 'There was no exception thrown.'
-    except ValueError:
-      assert True
-
-    except AssertionError:
-      raise
-
-    except Exception:
-      assert False, 'An unexcepted exception was thrown while parsing the yaml file.'
-
+    self.__compareResults(expected, result) 
 
   def __compareResults(self, should, result):
     for curShouldDict, curResultDict in zip(should, result):

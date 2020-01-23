@@ -1,6 +1,8 @@
 import logging
 from yaml import safe_load, YAMLError
 
+from src.user_message import UserMessage
+
 class FlowerHandler():
   def __init__(self):
     self.__logger = logging.getLogger().getChild('flower_handler')
@@ -27,6 +29,29 @@ class FlowerHandler():
 
     return self.__parsedFlowers
 
+  def getMessage(self, flowerName, percentage):
+    message = None
+    userMessage = None
+
+    for currentFlower in self.__parsedFlowers:
+      if currentFlower['name'] == flowerName:
+        message = self.__findMessage(currentFlower, percentage)
+
+    if message:
+      userMessage = UserMessage(text=message['message'])
+
+      if message['include_photo'] and message['photo_path']:
+        userMessage.includePhoto = True
+        userMessage.photoPath = message['photo_path']
+
+    return userMessage
+
+  def __findMessage(self, flower, percentage):
+    for curMessage in flower['messages']:
+      if curMessage['percentage_min'] <= percentage and curMessage['percentage_max'] >= percentage:
+        return curMessage
+
+    return None
   
   def __sanityCheck(self, parsedYaml):
     """

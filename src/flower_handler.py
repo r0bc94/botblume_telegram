@@ -103,7 +103,15 @@ class FlowerHandler():
             else:
               for curMin, curMax in lastRanges:
                 rangeInvalid |= currentMessage['percentage_min'] >= currentMessage['percentage_max']
-                rangeInvalid |= currentMessage['percentage_min'] <= curMax
+                
+                rangeInvalid |= currentMessage['percentage_min'] <= curMax and currentMessage['percentage_min'] >= curMin
+                rangeInvalid |= currentMessage['percentage_max'] >= curMin and currentMessage['percentage_max'] <= curMax
+
+                if rangeInvalid:
+                  break
+
+              if not rangeInvalid:
+                lastRanges.append([currentMessage['percentage_min'], currentMessage['percentage_max']])
 
             # Check if the path to a photo is provided, when the 
             # include_photo property is set to True.
@@ -111,7 +119,7 @@ class FlowerHandler():
               noPhotoPath = 'photo_path' not in currentMessage.keys()
 
           if rangeInvalid:
-            self.__logger.warning(f'Invalid Message Range {curMin} - {curMax}')
+            self.__logger.warning(f"Invalid Message Range {currentMessage['percentage_min']} - {currentMessage['percentage_max']}")
             self.__logger.warning('This Flower will be ignored.')
             self.__logger.warning('Hint: Check for any intersections in your message definitions.')
             break
@@ -166,4 +174,3 @@ class FlowerHandler():
       userMessageObjects.append(userMessage)
     
     return userMessageObjects
-

@@ -5,8 +5,12 @@ import configargparse
 from time import sleep
 
 from src.mqtt_client import MqttClient
+from src.telegram_bot import TelegramBot
+from src.flower_handler import FlowerHandler
 
 import paho.mqtt.client as mqtt
+
+from yaml import safe_load
 
 LOGGING_FORMAT = '[%(levelname)s] %(asctime)s %(name)s: %(message)s'
 LOGGING_LEVEL_COLORS = {
@@ -57,11 +61,32 @@ args = argumentParser.parse_args()
 logger = logging.getLogger(__name__)
 setup_logger(logger,  args.debug)
 
-def cb(message):
-    print(message)
+flowerHandler = FlowerHandler()
+flowerHandler.parse('flowers.yaml')
 
-mqttClient = MqttClient('192.168.1.5', 1883, 'blume', cb)
-mqttClient.start()
-while True:
-    sleep(1)
-    mqttClient.querySensor(1)
+# def cb(message):
+#     print(message)
+
+# mqttClient = MqttClient('192.168.1.5', 1883, 'blume', cb)
+# mqttClient.start()
+
+
+# chatId = ''
+
+# def telegramCB(update, context):
+#     print(update)
+#     print(context)
+#     global chatId
+#     chatId = update.message.chat_id
+
+# telegramBot = TelegramBot(args.telegram_api_token, telegramCB)
+# telegramBot.setupAndStart()
+# telegramBot.listen()
+
+# while True:
+#     sleep(1)
+#     print(chatId)
+#     if chatId: 
+#         telegramBot.sendMessage(chatId, 'test', photo=open('cat.jpg', 'rb'))
+#         chatId = ''
+    # mqttClient.querySensor(1)

@@ -1,12 +1,17 @@
 import logging
 from yaml import safe_load, YAMLError
 
-from src.user_message import UserMessage
+from src.types.flower import Flower
+from src.types.user_message import UserMessage
 
 class FlowerHandler():
   def __init__(self):
     self.__logger = logging.getLogger().getChild('flower_handler')
-    self.__parsedFlowers = []
+    self.__flowers = []
+
+  @property
+  def flowers(self):
+    return self.__flowers
 
   def parse(self, flowerFilePath):
     try:
@@ -16,7 +21,7 @@ class FlowerHandler():
       if not validFlowers:
         raise ValueError('Failed to parse all flowers from the FlowerFile.')
       
-      self.__parsedFlowers = validFlowers
+      self.__flowers = self.__createObjectsFromDicts(validFlowers)
 
     except FileNotFoundError:
       self.__logger.error('The flower file flowers.yaml was not found in the root directory of this application.')
@@ -27,38 +32,26 @@ class FlowerHandler():
       self.__logger.error('Please check the format of the given file.')
       self.__logger.exception(ymerr)
 
-    return self.__parsedFlowers
+    return self.__flowers
 
   def getMessage(self, flowerName, percentage):
-    message = None
-    userMessage = None
-
-    for currentFlower in self.__parsedFlowers:
-      if currentFlower['name'] == flowerName:
-        message = self.__findMessage(currentFlower, percentage)
-
-    if message:
-      userMessage = UserMessage(text=message['message'])
-
-      if message['include_photo'] and message['photo_path']:
-        userMessage.includePhoto = True
-        userMessage.photoPath = message['photo_path']
-
-    return userMessage
+    for currentFlower in self.__flowers:
+      if currentFlower.name == flowerName:
+        return self.__findMessage(currentFlower, percentage)
 
   def getFlower(self, flowerName):
-    for currentFlower in self.__parsedFlowers:
-      if currentFlower['name'] == flowerName:
+    for currentFlower in self.__flowers:
+      if currentFlower.name == flowerName:
         return currentFlower
 
   def getFlowerByMqttId(self, mqttId):
-    for currentFlower in self.__parsedFlowers:
-      if currentFlower['mqtt_id'] == mqttId:
+    for currentFlower in self.__flowers:
+      if currentFlower.mqttId == mqttId:
         return currentFlower
 
   def __findMessage(self, flower, percentage):
-    for curMessage in flower['messages']:
-      if curMessage['percentage_min'] <= percentage and curMessage['percentage_max'] >= percentage:
+    for curMessage in flower.messages:
+      if curMessage.percentageMin <= percentage and curMessage.percentageMax >= percentage:
         return curMessage
 
     return None
@@ -112,6 +105,7 @@ class FlowerHandler():
           if rangeInvalid:
             self.__logger.warning(f'Invalid Message Range {curMin} - {curMax}')
             self.__logger.warning('This Flower will be ignored.')
+            self.__logger.warning('Hint: Check for any intersections in your message definitions.')
             break
 
       # Check if the path to a photo is provided, when the 
@@ -130,4 +124,40 @@ class FlowerHandler():
         validFlowers.append(currentFlower)
   
     return validFlowers
+
+  def __createObjectsFromDicts(self, dicts):
+    objects = []
+    for currentDict in dicts:
+      name = currentDict['name']
+      mqttId = currentDict['mqtt_id']
+      messages = self.__createUserMessagesFromDicts(currentDict['messages'])
+
+      flowerObject = Flower(name=name, mqttId=mqttId, messages=messages)
+      objects.append(flowerObject)
+
+    return objects
+
+  def __createUserMessagesFromDicts(self, dicts):
+    userMessageObjects = []
+    
+    for currentUserMessage in dicts:
+
+      try:
+        percentageMin = currentUserMessage['percentage_min']
+        percentageMax = currentUserMessage['percentage_max']
+        message = currentUserMessage['message']
       
+        userMessage = UserMessage(percentageMin=percentageMin, percentageMax=percentageMax, message=message)
+      
+        if 'include_photo' in currentUserMessage.keys(): 
+          userMessage.includePhoto = currentUserMessage['include_photo']
+          userMessage.photoPath = currentUserMessage['photo_path']
+      except KeyError as ke:
+        self.__logger.warning(f'Missing Key in Message: "{ke}"')
+        self.__logger.warning(f'The Message will be skipped.')
+        continue
+
+      userMessageObjects.append(userMessage)
+    
+    return userMessageObjects
+

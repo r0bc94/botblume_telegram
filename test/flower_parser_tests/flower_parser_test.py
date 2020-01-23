@@ -10,7 +10,7 @@ class TestFlowerHandler():
 
   def testValid(self, flowerHandler):
     parsed = flowerHandler.parse('test/flower_parser_tests/valid_flowerfile.yaml')
-    should = [{'name': 'flower1', 'mqtt_id': 1, 'messages': [{'percentage_min': 0, 'percentage_max': 15, 'message': 'Please water me soon.', 'include_photo': True, 'photo_path': 'water.png'}, {'percentage_min': 16, 'percentage_max': 30, 'message': 'Im okay but you should water me in the near future'}]}]
+    should = [{'name': 'flower1', 'mqtt_id': 1, 'messages': [{'percentage_min': 0, 'percentage_max': 15, 'message': 'Please give me some water.', 'include_photo': True, 'photo_path': 'water.png'}, {'percentage_min': 16, 'percentage_max': 30, 'message': 'Im okay but you should water me in the near future'}]}]
     self.__compareResults(should, parsed)
     self.__compareResults(should, parsed)
 

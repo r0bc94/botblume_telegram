@@ -2,18 +2,27 @@ import pytest
 from yaml import safe_load
 
 from src.flower_handler import FlowerHandler
-from src.user_message import UserMessage
+from src.types.flower import Flower
+from src.types.user_message import UserMessage
 
 class TestFlowerHandler():
   @pytest.fixture(scope = "session")
   def flowerHandler(self):
     return FlowerHandler()
 
-  def testValid(self, flowerHandler):
+  @pytest.fixture(scope = "session")
+  def flowerFixture(self):
+    shouldMessage1 = UserMessage(percentageMin=0, percentageMax=15, message='Please give me some water.')
+    shouldMessage1.includePhoto = True
+    shouldMessage1.photoPath = 'water.png'
+    shouldMessage2 = UserMessage(percentageMin=16, percentageMax=30, message='Im okay but you should water me in the near future')
+    
+    return Flower(name='flower1', mqttId=1, messages=[shouldMessage1, shouldMessage2])
+
+  def testValid(self, flowerHandler, flowerFixture):
     parsed = flowerHandler.parse('test/flower_parser_tests/valid_flowerfile.yaml')
-    should = [{'name': 'flower1', 'mqtt_id': 1, 'messages': [{'percentage_min': 0, 'percentage_max': 15, 'message': 'Please give me some water.', 'include_photo': True, 'photo_path': 'water.png'}, {'percentage_min': 16, 'percentage_max': 30, 'message': 'Im okay but you should water me in the near future'}]}]
-    self.__compareResults(should, parsed)
-    self.__compareResults(should, parsed)
+    assert len(parsed) == 1, 'There where either not enough or too much parsed flowers.'
+    assert parsed[0] == flowerFixture
 
   def testIntersectingRanges(self, flowerHandler):
     try:
@@ -29,11 +38,11 @@ class TestFlowerHandler():
     except Exception:
       assert False, 'An unexcepted exception was thrown while parsing the yaml file.'
 
-  def testDublicateId(self, flowerHandler):
-    expected = [{'name': 'flower1', 'mqtt_id': 1, 'messages': [{'percentage_min': 0, 'percentage_max': 15, 'message': 'Please water me soon.', 'include_photo': True, 'photo_path': 'water.png'}, {'percentage_min': 16, 'percentage_max': 30, 'message': 'Im okay but you should water me in the near future'}]}]
-    result = flowerHandler.parse('test/flower_parser_tests/dublicate_id.yaml')
+  def testDublicateId(self, flowerHandler, flowerFixture):
+    parsed = flowerHandler.parse('test/flower_parser_tests/dublicate_id.yaml')
     
-    self.__compareResults(expected, result) 
+    assert len(parsed) == 1, 'There where either not enough or too much parsed flowers.'
+    assert parsed[0] == flowerFixture
 
   def testNoPhotoPath(self, flowerHandler):
     try:
@@ -47,30 +56,14 @@ class TestFlowerHandler():
       raise
 
     except Exception:
-      assert False, 'An unexcepted exception was thrown while parsing the yaml file.'
+      assert False, 'An unexpected exception was thrown while parsing the yaml file.'
 
   def testGetMessage(self, flowerHandler):
     flowerHandler.parse('test/flower_parser_tests/valid_flowerfile.yaml')
-    expectedMessage = UserMessage(text='Please give me some water.')
+    expectedMessage = UserMessage(percentageMin=0, percentageMax=15, message='Please give me some water.')
     expectedMessage.includePhoto = True
     expectedMessage.photoPath = 'water.png'
 
     actualMessage = flowerHandler.getMessage('flower1', 0)
-    self.__compareMessages(expectedMessage, actualMessage)
 
-  def __compareResults(self, should, result):
-    for curShouldDict, curResultDict in zip(should, result):
-      # Compare the keys
-      assert curShouldDict.keys() == curResultDict.keys(), 'The Dictionary does not contain all expected keys.'
-
-      # Compare the values:
-      for shKey, resKey in zip(curShouldDict.keys(), curResultDict.keys()):
-        assert curShouldDict[shKey] == curResultDict[resKey], f'Wrong Value for Key "{shKey}"'
-
-  def __compareMessages(self, expected, actual):
-    assert type(expected) == type(actual), 'The passed objects are not from the same type.'
-    assert expected.text == actual.text
-    
-    if expected.includePhoto:
-      assert expected.includePhoto == actual.includePhoto
-      assert expected.photoPath == actual.photoPath
+    assert expectedMessage == actualMessage

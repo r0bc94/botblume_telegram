@@ -3,7 +3,7 @@
   messages:
     - percentage_min: 0
       percentage_max: 15
-      message: "Please water me soon."
+      message: "Please give me some water."
       include_photo: true
       photo_path: "water.png"
 

@@ -5,7 +5,9 @@ class UserMessage():
   """
   Represents a message which is send to the user via the telegram bot.
   """
-  text: str
+  message: str
+  percentageMin: int
+  percentageMax: int
   __includePhoto: bool = False
   __photoPath: str = ''
 

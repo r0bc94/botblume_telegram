@@ -60,6 +60,8 @@ class FlowerHandler():
     """
     Sanity checks each given flower object, if all needed properties exists.
     Also the range of each message is checked for collisions.
+
+    Warning: This is probably one of the most ugly methods I've ever written.
     """
     validFlowers = []
 
@@ -70,6 +72,7 @@ class FlowerHandler():
       nameInvalid = False
       idInvalid = False
       rangeInvalid = False
+      noPhotoPath = False
 
       for key, value in currentFlower.items():
         if key not in neededKeys:
@@ -102,25 +105,28 @@ class FlowerHandler():
                 rangeInvalid |= currentMessage['percentage_min'] >= currentMessage['percentage_max']
                 rangeInvalid |= currentMessage['percentage_min'] <= curMax
 
+            # Check if the path to a photo is provided, when the 
+            # include_photo property is set to True.
+            if 'include_photo' in currentMessage and currentMessage['include_photo']:
+              noPhotoPath = 'photo_path' not in currentMessage.keys()
+
           if rangeInvalid:
             self.__logger.warning(f'Invalid Message Range {curMin} - {curMax}')
             self.__logger.warning('This Flower will be ignored.')
             self.__logger.warning('Hint: Check for any intersections in your message definitions.')
             break
 
-      # Check if the path to a photo is provided, when the 
-      # include_photo property is set to True.
-      if key == 'include_photo' and value == True:
-        if 'photo_path' not in currentFlower.keys():
-          self.__logger.warning('A photo should be included, but no path was specified.')
-          self.__logger.warning('Please specify the path to the photo by using the "photo_path" property.')
-      
+          if noPhotoPath:
+            self.__logger.warning('A photo should be included, but no path was specified.')
+            self.__logger.warning('Please specify the path to the photo by using the "photo_path" property.')
+            break
+
       if missingKeys:
         self.__logger.warning('There are some keys missing')
         self.__logger.warning(f'Missing Keys: {missingKeys}')
         continue
 
-      if not nameInvalid and not idInvalid and not rangeInvalid:
+      if not nameInvalid and not idInvalid and not rangeInvalid and not noPhotoPath:
         validFlowers.append(currentFlower)
   
     return validFlowers

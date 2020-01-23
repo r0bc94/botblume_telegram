@@ -46,6 +46,16 @@ class FlowerHandler():
 
     return userMessage
 
+  def getFlower(self, flowerName):
+    for currentFlower in self.__parsedFlowers:
+      if currentFlower['name'] == flowerName:
+        return currentFlower
+
+  def getFlowerByMqttId(self, mqttId):
+    for currentFlower in self.__parsedFlowers:
+      if currentFlower['mqtt_id'] == mqttId:
+        return currentFlower
+
   def __findMessage(self, flower, percentage):
     for curMessage in flower['messages']:
       if curMessage['percentage_min'] <= percentage and curMessage['percentage_max'] >= percentage:

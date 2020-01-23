@@ -1,7 +1,7 @@
 import logging
 import paho.mqtt.client as mqtt
 
-from src.message import Message
+from src.types.message import Message
 
 class MqttClient(mqtt.Client):
   """

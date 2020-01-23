@@ -2,6 +2,7 @@ import pytest
 from yaml import safe_load
 
 from src.flower_handler import FlowerHandler
+from src.user_message import UserMessage
 
 class TestFlowerHandler():
   @pytest.fixture(scope = "session")
@@ -48,6 +49,14 @@ class TestFlowerHandler():
     except Exception:
       assert False, 'An unexcepted exception was thrown while parsing the yaml file.'
 
+  def testGetMessage(self, flowerHandler):
+    flowerHandler.parse('test/flower_parser_tests/valid_flowerfile.yaml')
+    expectedMessage = UserMessage(text='Please give me some water.')
+    expectedMessage.includePhoto = True
+    expectedMessage.photoPath = 'water.png'
+
+    actualMessage = flowerHandler.getMessage('flower1', 0)
+    self.__compareMessages(expectedMessage, actualMessage)
 
   def __compareResults(self, should, result):
     for curShouldDict, curResultDict in zip(should, result):
@@ -57,3 +66,11 @@ class TestFlowerHandler():
       # Compare the values:
       for shKey, resKey in zip(curShouldDict.keys(), curResultDict.keys()):
         assert curShouldDict[shKey] == curResultDict[resKey], f'Wrong Value for Key "{shKey}"'
+
+  def __compareMessages(self, expected, actual):
+    assert type(expected) == type(actual), 'The passed objects are not from the same type.'
+    assert expected.text == actual.text
+    
+    if expected.includePhoto:
+      assert expected.includePhoto == actual.includePhoto
+      assert expected.photoPath == actual.photoPath

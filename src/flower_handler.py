@@ -34,9 +34,9 @@ class FlowerHandler():
 
     return self.__flowers
 
-  def getMessage(self, flowerName, percentage):
+  def getMessage(self, mqttId, percentage):
     for currentFlower in self.__flowers:
-      if currentFlower.name == flowerName:
+      if currentFlower.mqttId == mqttId:
         return self.__findMessage(currentFlower, percentage)
 
   def getFlower(self, flowerName):

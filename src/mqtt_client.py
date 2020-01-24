@@ -2,6 +2,7 @@ import logging
 import paho.mqtt.client as mqtt
 
 from src.types.message import Message
+from src.types.flower import Flower
 
 class MqttClient(mqtt.Client):
   """
@@ -34,9 +35,9 @@ class MqttClient(mqtt.Client):
     self.__logger.debug('Starting Listener Loop...')
     self.loop_start()
   
-  def querySensor(self, sensorNumber):
+  def querySensor(self, flower: Flower):
     #todo: Also make the parameter for the water level optional.
-    self.publish(f'{self.__mqttTopicName}/{sensorNumber}/wasserstand')
+    self.publish(f'{self.__mqttTopicName}/{flower.mqttId}/wasserstand')
 
   def shutdown(self):
     self.__logger.debug('Stopping MQTT - Listener Loop')

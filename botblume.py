@@ -8,6 +8,9 @@ from src.mqtt_client import MqttClient
 from src.telegram_bot import TelegramBot
 from src.flower_handler import FlowerHandler
 
+from src.types.message import Message
+from src.types.user_message import UserMessage
+
 import paho.mqtt.client as mqtt
 
 from yaml import safe_load
@@ -61,32 +64,59 @@ args = argumentParser.parse_args()
 logger = logging.getLogger(__name__)
 setup_logger(logger,  args.debug)
 
+mqttClient = None
+telegramBot = None
+
+lastChatIds = []
+
+def mqttCallback(message: Message):
+    if message.requested:
+        global lastChatIds
+        messageToSend = f'Water level at {message.aggregatedValue} %'
+        telegramBot.sendMessage(lastChatIds[0], messageToSend)
+
+        messageForState: UserMessage = flowerHandler.getMessage(int(message.sensorNumber), int(message.aggregatedValue))
+        if messageForState:
+            if messageForState.includePhoto:
+                telegramBot.sendMessage(lastChatIds[0], messageForState.message, photo=messageForState.photoPath)
+
+            else:
+                telegramBot.sendMessage(lastChatIds[0], messageForState.message)
+
+        lastChatIds = lastChatIds[1:]
+
+def telegramCallback(update, context):
+    print('todo: send request to the mqtt - client')
+    logger.debug('Sending a Request to the MQTT - Handler')
+    
+    chatId = update.message.chat.id
+    if len(context.args) != 1:
+        telegramBot.sendMessage(chatId, 'Wrong Arguments :(. See /help for any additional informations.\nTodo: Implement /help command.')
+        return
+    
+    flowerName = context.args[0]
+    flower = flowerHandler.getFlower(flowerName)
+    logger.debug(f'Sending an mqtt - request for flower: {flower}')
+    mqttClient.querySensor(flower)
+    lastChatIds.append(chatId)
+
 flowerHandler = FlowerHandler()
-flowerHandler.parse('flowers.yaml')
 
-# def cb(message):
-#     print(message)
+try:
+    flowerHandler.parse('flowers.yaml')
+except ValueError:
+    logger.error('Failed to parse the flower file.')
+    exit(1)
 
-# mqttClient = MqttClient('192.168.1.5', 1883, 'blume', cb)
-# mqttClient.start()
+mqttClient = MqttClient(args.mqtt_server_address, args.mqtt_server_port, 'blume', mqttCallback)
+telegramBot = TelegramBot(args.telegram_api_token, telegramCallback)
 
+logger.info('Starting the MQTT - Client')
+mqttClient.start()
 
-# chatId = ''
-
-# def telegramCB(update, context):
-#     print(update)
-#     print(context)
-#     global chatId
-#     chatId = update.message.chat_id
-
-# telegramBot = TelegramBot(args.telegram_api_token, telegramCB)
-# telegramBot.setupAndStart()
-# telegramBot.listen()
-
-# while True:
-#     sleep(1)
-#     print(chatId)
-#     if chatId: 
-#         telegramBot.sendMessage(chatId, 'test', photo=open('cat.jpg', 'rb'))
-#         chatId = ''
-    # mqttClient.querySensor(1)
+try:
+    logger.info('Entering the Telegram Bot listener loop')
+    telegramBot.setup()
+    telegramBot.listen()
+except KeyboardInterrupt:
+    logger.info('Shutting down the bot...')

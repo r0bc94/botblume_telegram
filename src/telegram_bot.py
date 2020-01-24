@@ -8,7 +8,7 @@ class TelegramBot():
     self.__logger = logging.getLogger().getChild('TelegramBot')
     self.__messageCallback = messageCallback
 
-  def setupAndStart(self):
+  def setup(self):
     self.__dispatcher.add_handler(CommandHandler('wasserstand', self.__flowerCommand))
 
   def __flowerCommand(self, update, context):
@@ -18,7 +18,7 @@ class TelegramBot():
     
   def sendMessage(self, chatId, message, photo=None):
     if photo:
-      self.__updater.bot.send_photo(chat_id=chatId, photo=photo)
+      self.__updater.bot.send_photo(chat_id=chatId, photo=open(photo, 'rb'))
     
     self.__logger.debug(f'Sending Message to chat with id: {chatId}')
     self.__logger.debug(f'Message Content: {message}')
